@@ -42,6 +42,7 @@ jobs:
             cd sm
             git clone https://github.com/audacious-software/Quicksilver-Django.git quicksilver
             cp simple_data_export/circle_settings.py sm/settings.py
+            mkdir -p media/simple_data_export_uploads
             python manage.py migrate
             python manage.py test
             cp simple_data_export/.pylintrc .
@@ -89,6 +90,7 @@ jobs:
             cd sm
             git clone https://github.com/audacious-software/Quicksilver-Django.git quicksilver
             cp simple_data_export/circle_settings.py sm/settings.py
+            mkdir -p media/simple_data_export_uploads
             python manage.py migrate
             python manage.py test
             cp simple_data_export/.pylintrc .
