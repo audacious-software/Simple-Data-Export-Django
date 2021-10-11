@@ -5,7 +5,6 @@ from __future__ import print_function
 
 from builtins import str # pylint: disable=redefined-builtin
 
-import datetime
 import importlib
 import io
 import json
@@ -14,9 +13,8 @@ import tempfile
 import traceback
 import zipfile
 
+import arrow
 import zipstream
-
-import pytz
 
 from django.conf import settings
 from django.core.files import File
@@ -64,31 +62,11 @@ class Command(BaseCommand):
                 start_time = None
                 end_time = None
 
-                tz_info = pytz.timezone(settings.TIME_ZONE)
-
                 if 'start_time' in parameters and parameters['start_time']:
-                    tokens = parameters['start_time'].split('/')
-
-                    start_time = datetime.datetime(int(tokens[2]), \
-                                                   int(tokens[0]), \
-                                                   int(tokens[1]), \
-                                                   0, \
-                                                   0, \
-                                                   0, \
-                                                   0, \
-                                                   tz_info)
+                    start_time = arrow.get(parameters['start_time']).datetime
 
                 if 'end_time' in parameters and parameters['end_time']:
-                    tokens = parameters['end_time'].split('/')
-
-                    end_time = datetime.datetime(int(tokens[2]), \
-                                                 int(tokens[0]), \
-                                                 int(tokens[1]), \
-                                                 23, \
-                                                 59, \
-                                                 59, \
-                                                 999999, \
-                                                 tz_info)
+                    end_time = arrow.get(parameters['end_time']).datetime
 
                 prefix = 'simple_data_export_final'
 
@@ -172,9 +150,17 @@ class Command(BaseCommand):
                 report.save()
 
                 if report.requester.email is not None:
+                    site_human_name = 'Simple Data Exporter'
+
+                    try:
+                        site_human_name = settings.SIMPLE_DATA_EXPORTER_SITE_NAME
+                    except AttributeError:
+                        pass
+
                     subject = render_to_string('simple_data_export_report_subject.txt', {
                         'report': report,
-                        'url': settings.SITE_URL
+                        'url': settings.SITE_URL,
+                        'name': site_human_name
                     })
 
                     if 'email_subject' in parameters:
@@ -182,18 +168,13 @@ class Command(BaseCommand):
 
                     message = render_to_string('simple_data_export_report_message.txt', {
                         'report': report,
-                        'url': settings.SITE_URL
+                        'url': settings.SITE_URL,
+                        'name': site_human_name
                     })
 
                     tokens = settings.SITE_URL.split('/')
                     host = ''
 
-                    site_human_name = 'Simple Data Exporter'
-
-                    try:
-                        site_human_name = settings.SIMPLE_DATA_EXPORTER_SITE_NAME
-                    except AttributeError:
-                        pass
 
                     while tokens and tokens[-1] == '':
                         tokens.pop()
@@ -207,8 +188,11 @@ class Command(BaseCommand):
                               [report.requester.email], \
                               fail_silently=False)
 
-                for extra_destination in report.requester.pdk_report_destinations.all():
-                    extra_destination.transmit(filename)
+                try:
+                    for extra_destination in report.requester.simple_data_export_report_destinations.all():
+                        extra_destination.transmit(filename)
+                except AttributeError:
+                    pass
 
                 remove_sleep = 1.0
 
