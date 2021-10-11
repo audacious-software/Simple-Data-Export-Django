@@ -1,5 +1,7 @@
 # pylint: disable=line-too-long
 
+from __future__ import print_function
+
 import io
 import os
 import shutil
