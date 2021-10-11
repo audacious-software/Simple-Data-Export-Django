@@ -96,8 +96,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
-MEDIA_URL = '/MEDIA_URL/
-MEDIA_ROOT = str(BASE_DIR) + '/MEDIA_URL/'
+MEDIA_URL = '/media/
+MEDIA_ROOT = str(BASE_DIR) + '/media/'
 
 STATIC_ROOT = str(BASE_DIR) + '/static/'
 STATIC_ROOT = 'static'
