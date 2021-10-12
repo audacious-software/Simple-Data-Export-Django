@@ -12,6 +12,7 @@ from django.utils.encoding import smart_str
 from django.utils.text import slugify
 
 from .models import ReportJob
+from .utils import fetch_export_identifier
 
 @staff_member_required
 def simple_data_export_download_report(request, report_id): # pylint: disable=unused-argument
@@ -42,7 +43,7 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
             for data_source in data_sources:
                 if (data_source in context['data_sources']) is False:
-                    context['data_sources'].append((slugify(data_source), data_source,))
+                    context['data_sources'].append((slugify(data_source), fetch_export_identifier(data_source),))
         except ImportError:
             pass
         except AttributeError:
