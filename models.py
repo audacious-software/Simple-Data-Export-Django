@@ -93,6 +93,24 @@ def check_reports_upload_available(app_configs, **kwargs): # pylint: disable=unu
 
     return errors
 
+@register()
+def check_data_export_parameters(app_configs, **kwargs): # pylint: disable=unused-argument
+    errors = []
+
+    if hasattr(settings, 'SITE_URL') is False:
+        error = Error('SITE_URL parameter not defined', hint='Update configuration to include SITE_URL.', obj=None, id='simple_data_export.E003')
+        errors.append(error)
+
+    if hasattr(settings, 'SIMPLE_DATA_EXPORTER_SITE_NAME') is False:
+        error = Error('SIMPLE_DATA_EXPORTER_SITE_NAME parameter not defined', hint='Update configuration to include SIMPLE_DATA_EXPORTER_SITE_NAME.', obj=None, id='simple_data_export.E004')
+        errors.append(error)
+
+    if hasattr(settings, 'SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS') is False:
+        error = Error('SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS parameter not defined', hint='Update configuration to include SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS.', obj=None, id='simple_data_export.E005')
+        errors.append(error)
+
+    return errors
+
 class ReportDestination(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='simple_data_export_destinations', on_delete=models.CASCADE)
 

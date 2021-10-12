@@ -101,3 +101,5 @@ MEDIA_ROOT = str(BASE_DIR) + '/media/'
 
 STATIC_ROOT = str(BASE_DIR) + '/static/'
 STATIC_ROOT = 'static'
+
+SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = True

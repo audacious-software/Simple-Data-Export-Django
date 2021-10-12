@@ -95,19 +95,22 @@ class Command(BaseCommand):
                                         export_api = importlib.import_module(app + '.simple_data_export_api')
 
                                         try:
-                                            output_file = os.path.normpath(export_api.compile_data_export(data_type, data_sources, start_time=start_time, end_time=end_time, custom_parameters=custom_parameters))
+                                            file_path = export_api.compile_data_export(data_type, data_sources, start_time=start_time, end_time=end_time, custom_parameters=custom_parameters)
 
-                                            if output_file is not None:
-                                                output_file = os.path.normpath(output_file)
+                                            if file_path is not None:
+                                                output_file = os.path.normpath(file_path)
 
-                                                if output_file.lower().endswith('.zip'):
-                                                    zips_to_merge.append(output_file)
-                                                else:
-                                                    name = os.path.basename(os.path.normpath(output_file))
+                                                if output_file is not None:
+                                                    output_file = os.path.normpath(output_file)
 
-                                                    export_stream.write(output_file, name, compress_type=zipfile.ZIP_DEFLATED)
+                                                    if output_file.lower().endswith('.zip'):
+                                                        zips_to_merge.append(output_file)
+                                                    else:
+                                                        name = os.path.basename(os.path.normpath(output_file))
 
-                                                    to_delete.append(output_file)
+                                                        export_stream.write(output_file, name, compress_type=zipfile.ZIP_DEFLATED)
+
+                                                        to_delete.append(output_file)
                                         except TypeError as exception:
                                             traceback.print_exc()
                                             print('Verify that ' + app + ' "' + data_type + '" exporter implements all compile_data_export arguments!')
