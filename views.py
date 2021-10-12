@@ -21,7 +21,7 @@ def simple_data_export_download_report(request, report_id): # pylint: disable=un
 
     response = FileResponse(io.open(filename, 'rb'), content_type='application/octet-stream') # pylint: disable=consider-using-with
 
-    download_name = 'pdk-export_' + job.started.date().isoformat() + '_' + smart_str(job.pk) + '.zip'
+    download_name = 'data-export_' + job.started.date().isoformat() + '_' + smart_str(job.pk) + '.zip'
 
     response['Content-Length'] = os.path.getsize(filename)
     response['Content-Disposition'] = 'attachment; filename=' + download_name
