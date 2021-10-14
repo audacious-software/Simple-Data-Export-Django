@@ -53,7 +53,7 @@ class ReportJob(models.Model):
     report = models.FileField(upload_to=SIMPLE_DATA_EXPORT_FILE_FOLDER, null=True, blank=True)
 
     def get_absolute_url(self):
-        return reverse('simple_data_export_download', args=[self.pk])
+        return reverse('simple_data_export_download_report', args=[self.pk])
 
 @receiver(post_delete, sender=ReportJob)
 def report_job_post_delete_handler(sender, **kwargs): # pylint: disable=unused-argument

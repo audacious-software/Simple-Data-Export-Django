@@ -43,7 +43,7 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
             for data_source in data_sources:
                 if (data_source in context['data_sources']) is False:
-                    context['data_sources'].append((slugify(data_source), fetch_export_identifier(data_source),))
+                    context['data_sources'].append((slugify(data_source), fetch_export_identifier(data_source), data_source))
         except ImportError:
             pass
         except AttributeError:
@@ -71,7 +71,7 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
         for source in context['data_sources']:
             if ('source_' + source[0]) in request.POST: # pylint: disable=superfluous-parens
-                selected_sources.append(source[1])
+                selected_sources.append(source[2])
 
         for data_type in context['data_types']:
             if ('data_type_' + data_type[0]) in request.POST: # pylint: disable=superfluous-parens
