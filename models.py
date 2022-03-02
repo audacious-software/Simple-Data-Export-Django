@@ -79,7 +79,7 @@ def check_reports_upload_protected(app_configs, **kwargs): # pylint: disable=unu
 
             errors.append(error)
     except: # pylint: disable=bare-except
-        warning = Warning('Unable to connect to %s' % http_url, hint='Verify that the webserver is properly configured.', obj=None, id='simple_data_export.W001')
+        warning = Warning('Unable to connect to %s' % http_url, hint='Verify that the webserver is properly configured.', obj=None, id='simple_data_export.W001') # pylint: disable=consider-using-f-string
 
         errors.append(warning)
 
