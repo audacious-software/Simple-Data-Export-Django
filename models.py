@@ -7,7 +7,7 @@ import os
 import requests
 
 from django.conf import settings
-from django.core.checks import Error, register
+from django.core.checks import Error, Warning, register # pylint: disable=redefined-builtin
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -71,12 +71,17 @@ def check_reports_upload_protected(app_configs, **kwargs): # pylint: disable=unu
 
     http_url = 'https://' + settings.ALLOWED_HOSTS[0] + settings.MEDIA_URL + SIMPLE_DATA_EXPORT_FILE_FOLDER
 
-    response = requests.get(http_url)
+    try:
+        response = requests.get(http_url)
 
-    if response.status_code >= 200 and response.status_code < 400:
-        error = Error('Raw reports folder is readable over HTTP', hint='Update webserver configuration to deny read access (' + http_url + ') via HTTP(S).', obj=None, id='simple_data_export.E001')
+        if response.status_code >= 200 and response.status_code < 400:
+            error = Error('Raw reports folder is readable over HTTP', hint='Update webserver configuration to deny read access (' + http_url + ') via HTTP(S).', obj=None, id='simple_data_export.E001')
 
-        errors.append(error)
+            errors.append(error)
+    except: # pylint: disable=bare-except
+        warning = Warning('Unable to connect to %s' % http_url, hint='Verify that the webserver is properly configured.', obj=None, id='simple_data_export.W001')
+
+        errors.append(warning)
 
     return errors
 
