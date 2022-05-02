@@ -69,6 +69,9 @@ def report_job_post_delete_handler(sender, **kwargs): # pylint: disable=unused-a
 def check_reports_upload_protected(app_configs, **kwargs): # pylint: disable=unused-argument
     errors = []
 
+    if 'simple_data_export.W001' in settings.SILENCED_SYSTEM_CHECKS or 'simple_data_export.E001' in settings.SILENCED_SYSTEM_CHECKS:
+        return errors
+
     http_url = 'https://' + settings.ALLOWED_HOSTS[0] + settings.MEDIA_URL + SIMPLE_DATA_EXPORT_FILE_FOLDER
 
     try:
