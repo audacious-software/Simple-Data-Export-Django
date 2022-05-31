@@ -43,11 +43,16 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
             for data_source in data_sources:
                 if (data_source in context['data_sources']) is False:
-                    context['data_sources'].append((slugify(data_source), fetch_export_identifier(data_source), data_source))
+                    new_source = (slugify(data_source), fetch_export_identifier(data_source), data_source)
+
+                    if (new_source in context['data_sources']) is False:
+                        context['data_sources'].append(new_source)
         except ImportError:
             pass
         except AttributeError:
             pass
+
+    context['data_sources'].sort(key=lambda source: source[1])
 
     context['data_types'] = []
 
