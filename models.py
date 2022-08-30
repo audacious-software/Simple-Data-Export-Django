@@ -75,7 +75,7 @@ def check_reports_upload_protected(app_configs, **kwargs): # pylint: disable=unu
     http_url = 'https://' + settings.ALLOWED_HOSTS[0] + settings.MEDIA_URL + SIMPLE_DATA_EXPORT_FILE_FOLDER
 
     try:
-        response = requests.get(http_url)
+        response = requests.get(http_url, timeout=120)
 
         if (response.status_code >= 200 and response.status_code < 400) and len(response.text) > 0: # pylint: disable=len-as-condition
             error = Error('Raw reports folder is readable over HTTP', hint='Update webserver configuration to deny read access (' + http_url + ') via HTTP(S).', obj=None, id='simple_data_export.E001')
