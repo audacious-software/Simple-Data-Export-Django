@@ -5,7 +5,7 @@ bandit==1.7.1; python_version == '3.6'
 bandit==1.7.4; python_version >= '3.7'
 Django==1.11.29; python_version < '3.0'
 Django==3.2.16; python_version >= '3.0'
-dropbox==11.35.0
+dropbox==11.36.0
 future==0.18.2
 lockfile==0.12.2
 paramiko==2.11.0
