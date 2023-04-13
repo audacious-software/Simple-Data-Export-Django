@@ -52,8 +52,6 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
         except AttributeError:
             pass
 
-    context['data_sources'].sort(key=lambda source: source[1])
-
     context['data_types'] = []
 
     for app in settings.INSTALLED_APPS:
