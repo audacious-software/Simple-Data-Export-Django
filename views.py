@@ -18,7 +18,7 @@ from .utils import fetch_export_identifier
 def simple_data_export_download_report(request, report_id): # pylint: disable=unused-argument
     job = get_object_or_404(ReportJob, pk=int(report_id))
 
-    filename = settings.MEDIA_ROOT + '/' + job.report.name
+    filename = '%s/%s' % (settings.MEDIA_ROOT, job.report.name)
 
     response = FileResponse(io.open(filename, 'rb'), content_type='application/octet-stream') # pylint: disable=consider-using-with
 

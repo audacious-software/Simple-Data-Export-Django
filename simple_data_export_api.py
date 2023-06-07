@@ -3,19 +3,25 @@
 from __future__ import print_function
 
 import io
+import json
 import os
 import shutil
 import time
 import traceback
 
+import boto3
 import dropbox
 import paramiko
+import pytz
+
+from botocore.config import Config
 
 from django.conf import settings
-from django.utils import timezone
 
-def send_to_destination(destination, report_path): # pylint: disable=too-many-branches, too-many-statements
+def send_to_destination(destination, report_path, report): # pylint: disable=too-many-branches, too-many-statements, too-many-locals
     file_sent = False
+
+    here_tz = pytz.timezone(settings.TIME_ZONE)
 
     sleep_durations = [
         0,
@@ -29,25 +35,39 @@ def send_to_destination(destination, report_path): # pylint: disable=too-many-br
     except AttributeError:
         pass # Use defaults above.
 
+    report_parameters = json.loads(report.parameters).get('custom_parameters', {})
+
+    parameters = destination.fetch_parameters()
+
+    parameters.update(report_parameters)
+
     if destination.destination == 'dropbox':
         try:
-            parameters = destination.fetch_parameters()
-
             if 'access_token' in parameters:
                 client = dropbox.Dropbox(parameters['access_token'])
 
                 path = '/'
 
-                if 'path' in parameters:
-                    path = parameters['path']
+                if 'path' in report_parameters:
+                    path = report_parameters['path']
 
-                path = path + '/'
+                    path = path + '/'
 
-                if ('prepend_host' in parameters) and parameters['prepend_host']:
+                if parameters.get('prepend_host', False):
                     path = path + settings.ALLOWED_HOSTS[0] + '-'
 
-                if ('prepend_date' in parameters) and parameters['prepend_date']:
-                    path = path + timezone.now().date().isoformat() + '-'
+                if parameters.get('prepend_date', False):
+                    path = path + report.requested.astimezone(here_tz).date().isoformat() + '-'
+
+                if parameters.get('prepend_source_range', False):
+                    report_parameters = json.loads(report.parameters)
+
+                    data_sources = report_parameters.get('data_sources', [])
+
+                    if len(data_sources) == 1:
+                        path = path + data_sources[0] + '-'
+                    elif len(data_sources) >= 2:
+                        path = path + data_sources[0] + '.' + data_sources[-1] + '-'
 
                 path = path + os.path.basename(os.path.normpath(report_path))
 
@@ -69,16 +89,29 @@ def send_to_destination(destination, report_path): # pylint: disable=too-many-br
             traceback.print_exc()
     elif destination.destination == 'sftp': # pylint: disable=too-many-nested-blocks
         try:
-            parameters = destination.fetch_parameters()
-
             if ('username' in parameters) and ('host' in parameters) and ('key' in parameters):
                 path = ''
 
                 if 'path' in parameters:
                     path = parameters['path']
 
-                if ('prepend_date' in parameters) and parameters['prepend_date']:
-                    path = path + timezone.now().date().isoformat() + '-'
+                    path = path + '/'
+
+                if parameters.get('prepend_host', False):
+                    path = path + settings.ALLOWED_HOSTS[0] + '-'
+
+                if parameters.get('prepend_date', False):
+                    path = path + report.requested.astimezone(here_tz).date().isoformat() + '-'
+
+                if parameters.get('prepend_source_range', False):
+                    report_parameters = json.loads(report.parameters)
+
+                    data_sources = report_parameters.get('data_sources', [])
+
+                    if len(data_sources) == 1:
+                        path = path + data_sources[0] + '-'
+                    elif len(data_sources) >= 2:
+                        path = path + data_sources[0] + '.' + data_sources[-1] + '-'
 
                 path = path + os.path.basename(os.path.normpath(report_path))
 
@@ -115,16 +148,77 @@ def send_to_destination(destination, report_path): # pylint: disable=too-many-br
 
         except BaseException:
             traceback.print_exc()
+    elif destination.destination == 's3':
+        try:
+            if ('region' in parameters) and ('access_key_id' in parameters) and ('secret_access_key' in parameters) and ('bucket' in parameters):
+                aws_config = Config(
+                    region_name=parameters['region'],
+                    retries={'max_attempts': 10, 'mode': 'standard'}
+                )
+
+                os.environ['AWS_ACCESS_KEY_ID'] = parameters['access_key_id']
+                os.environ['AWS_SECRET_ACCESS_KEY'] = parameters['secret_access_key']
+
+                client = boto3.client('s3', config=aws_config)
+
+                s3_bucket = parameters['bucket']
+
+                path = ''
+
+                if 'path' in parameters:
+                    path = parameters['path']
+
+                    if path[-1] != '/':
+                        path = path + '/'
+
+                if parameters.get('prepend_host', False):
+                    path = path + settings.ALLOWED_HOSTS[0] + '-'
+
+                if parameters.get('prepend_date', False):
+                    path = path + report.requested.astimezone(here_tz).date().isoformat() + '-'
+
+                if parameters.get('prepend_source_range', False):
+                    report_parameters = json.loads(report.parameters)
+
+                    data_sources = report_parameters.get('data_sources', [])
+
+                    if len(data_sources) == 1:
+                        path = path + data_sources[0] + '-'
+                    elif len(data_sources) >= 2:
+                        path = path + data_sources[0] + '.' + data_sources[-1] + '-'
+
+                path = path + os.path.basename(os.path.normpath(report_path))
+
+                with io.open(report_path, 'rb') as report_file:
+                    client.put_object(Body=report_file.read(), Bucket=s3_bucket, Key=path)
+
+                    file_sent = True
+        except BaseException:
+            traceback.print_exc()
 
     elif destination.destination == 'local':
         try:
-            parameters = destination.fetch_parameters()
-
             if 'path' in parameters:
                 path = parameters['path']
 
-            if ('prepend_date' in parameters) and parameters['prepend_date']:
-                path = path + timezone.now().date().isoformat() + '-'
+                if path[-1] != '/':
+                    path = path + '/'
+
+            if parameters.get('prepend_host', False):
+                path = path + settings.ALLOWED_HOSTS[0] + '-'
+
+            if parameters.get('prepend_date', False):
+                path = path + report.requested.astimezone(here_tz).date().isoformat() + '-'
+
+            if parameters.get('prepend_source_range', False):
+                report_parameters = json.loads(report.parameters)
+
+                data_sources = report_parameters.get('data_sources', [])
+
+                if len(data_sources) == 1:
+                    path = path + data_sources[0] + '-'
+                elif len(data_sources) >= 2:
+                    path = path + data_sources[0] + '.' + data_sources[-1] + '-'
 
             path = path + os.path.basename(os.path.normpath(report_path))
 

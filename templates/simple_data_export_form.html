@@ -48,7 +48,7 @@
 						<span id="select_all_sources" class="float-end"><i class="fas fa-square"></i></span>
 						<span id="deselect_all_sources" class="float-end"><i class="fas fa-check-square"></i></span>
 						<h4>Select Data Sources</h4>
-						<div class="border rounded-2 p-3" style="height: 40em;">
+						<div class="border rounded-2 p-3" style="height: 40em; overflow-y: scroll;">
 							{% for source in data_sources %}
 								<div class="form-check">
 									<input class="form-check-input source_checkbox" type="checkbox" name="source_{{ source.0 }}" id="source_{{ source.0 }}">

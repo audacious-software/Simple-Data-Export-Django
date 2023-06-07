@@ -14,6 +14,7 @@ import traceback
 import zipfile
 
 import arrow
+import pytz
 import zipstream
 
 from django.conf import settings
@@ -25,7 +26,7 @@ from django.utils import timezone
 
 from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
-from ...models import ReportJob, ReportJobBatchRequest
+from ...models import ReportJob, ReportJobBatchRequest, ReportDestination
 
 REMOVE_SLEEP_MAX = 60 # Added to avoid "WindowsError: [Error 32] The process cannot access the file because it is being used by another process"
 
@@ -40,6 +41,8 @@ class Command(BaseCommand):
     @handle_schedule
     def handle(self, *args, **options): # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         os.umask(000)
+
+        here_tz = pytz.timezone(settings.TIME_ZONE)
 
         pending = ReportJob.objects.filter(started=None, completed=None)
 
@@ -73,7 +76,7 @@ class Command(BaseCommand):
                 if 'prefix' in parameters:
                     prefix = parameters['prefix']
 
-                suffix = report.started.date().isoformat()
+                suffix = report.started.astimezone(here_tz).date().isoformat()
 
                 if 'suffix' in parameters:
                     suffix = parameters['suffix']
@@ -192,10 +195,10 @@ class Command(BaseCommand):
                               fail_silently=False)
 
                 try:
-                    for extra_destination in report.requester.simple_data_export_report_destinations.all():
-                        extra_destination.transmit(filename)
+                    for extra_destination in ReportDestination.objects.filter(user=report.requester):
+                        extra_destination.transmit(filename, report)
                 except AttributeError:
-                    pass
+                    traceback.print_exc()
 
                 remove_sleep = 1.0
 

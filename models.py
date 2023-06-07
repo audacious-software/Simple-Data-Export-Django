@@ -141,12 +141,12 @@ class ReportDestination(models.Model):
         self.parameters = json.dumps(parameters, indent=2)
         self.save()
 
-    def transmit(self, report_file):
+    def transmit(self, file_path, report):
         for app in settings.INSTALLED_APPS:
             try:
                 export_api = importlib.import_module(app + '.simple_data_export_api')
 
-                export_api.send_to_destination(self, report_file)
+                export_api.send_to_destination(self, file_path, report)
             except ImportError:
                 pass
             except AttributeError:
