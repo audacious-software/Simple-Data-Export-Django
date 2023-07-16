@@ -140,6 +140,8 @@ def send_to_destination(destination, report_path, report): # pylint: disable=too
                         ftp_client.close()
 
                         file_sent = True
+
+                        break
                     except: # pylint: disable=bare-except
                         if duration == sleep_durations[-1]:
                             print('Unable to upload - error encountered. (Latest sleep = ' + str(duration) + ' seconds.)')

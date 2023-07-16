@@ -141,7 +141,7 @@ class Command(BaseCommand):
                                         traceback.print_exc()
 
                 if zips_to_merge:
-                    with zipfile.ZipFile(filename, 'a') as zip_output:
+                    with zipfile.ZipFile(filename, 'a', compression=zipfile.ZIP_DEFLATED) as zip_output:
                         for zip_filename in zips_to_merge:
                             with zipfile.ZipFile(zip_filename, 'r') as zip_file:
                                 for child_file in zip_file.namelist():
