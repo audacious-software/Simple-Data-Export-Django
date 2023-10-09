@@ -9,7 +9,7 @@ boto3==1.28.57; python_version >= '3.7'
 boto3==1.23.10; python_version >= '3.0' and python_version < '3.7'
 boto3==1.17.112; python_version < '3.0'
 Django==1.11.29; python_version < '3.0'
-Django==3.2.21; python_version >= '3.0'
+Django==3.2.22; python_version >= '3.0'
 dropbox==11.36.2
 future==0.18.3
 lockfile==0.12.2
