@@ -131,7 +131,7 @@ def send_to_destination(destination, report_path, report): # pylint: disable=too
                             pass
 
                         if trust_host_keys:
-                            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy()) # lgtm[py/paramiko-missing-host-key-validation]
+                            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy()) # nosec
 
                         ssh_client.connect(hostname=parameters['host'], username=parameters['username'], pkey=key)
 
