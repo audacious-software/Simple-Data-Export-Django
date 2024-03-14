@@ -1,6 +1,11 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, wrong-import-position
 
-from django.conf.urls import url
+import sys
+
+if sys.version_info[0] > 2:
+    from django.urls import re_path as url # pylint: disable=no-name-in-module
+else:
+    from django.conf.urls import url
 
 from .views import simple_data_export_download_report, simple_data_export_form
 
