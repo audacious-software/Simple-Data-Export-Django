@@ -28,4 +28,5 @@ pylint==3.1.0; python_version >= '3.8'
 pytz==2024.1
 requests==2.27.1; python_version <= '3.6'
 requests==2.31.0; python_version >= '3.7'
+stone==3.3.1; python_version < '3.0'
 zipstream==1.1.4
