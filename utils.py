@@ -1,4 +1,3 @@
-import codecs
 import importlib
 
 import unicodecsv
