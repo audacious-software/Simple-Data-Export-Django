@@ -1,11 +1,7 @@
 import codecs
-import csv
 import importlib
 
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+import unicodecsv
 
 from django.conf import settings
 
@@ -35,20 +31,11 @@ def fetch_export_identifier(original_identifier):
     return original_identifier
 
 class UnicodeWriter: # pylint: disable=old-style-class
-    def __init__(self, file_stream, dialect=csv.excel, encoding='utf-8-sig', **kwds):
-        self.queue = StringIO()
-        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
-        self.stream = file_stream
-        self.encoder = codecs.getincrementalencoder(encoding)()
+    def __init__(self, file_stream, dialect=unicodecsv.excel, encoding='utf-8-sig', **kwds):
+        self.writer = unicodecsv.writer(file_stream, dialect=dialect, encoding=encoding, **kwds)
 
     def writerow(self, row):
-        self.writer.writerow([s.encode('utf-8') for s in row])
-        data = self.queue.getvalue()
-        data = data.decode('utf-8')
-        data = self.encoder.encode(data)
-        self.stream.write(data)
-        self.queue.truncate(0)
+        self.writer.writerow(row)
 
     def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
+        self.writer.writerows(rows)
