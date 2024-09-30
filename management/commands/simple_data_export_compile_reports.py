@@ -188,11 +188,15 @@ class Command(BaseCommand):
                     if tokens:
                         host = tokens[-1]
 
-                    send_mail(subject, \
-                              message, \
-                              site_human_name + ' <noreply@' + host + '>', \
-                              [report.requester.email], \
-                              fail_silently=False)
+                    from_addr = site_human_name + ' <noreply@' + host + '>'
+
+                    try:
+                        from_addr = settings.SIMPLE_DATA_EXPORT_FROM_ADDRESS
+
+                    except AttributeError:
+                        pass
+
+                    send_mail(subject, message, from_addr, [report.requester.email], fail_silently=False)
 
                 try:
                     for extra_destination in ReportDestination.objects.filter(user=report.requester):
