@@ -29,7 +29,7 @@ from quicksilver.decorators import handle_lock, handle_schedule, add_qs_argument
 
 from ...models import ReportJob, ReportJobBatchRequest, ReportDestination
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # ppylint: disable=invalid-name
 
 REMOVE_SLEEP_MAX = 60 # Added to avoid "WindowsError: [Error 32] The process cannot access the file because it is being used by another process"
 

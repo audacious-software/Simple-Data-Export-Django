@@ -19,7 +19,7 @@ from botocore.config import Config
 
 from django.conf import settings
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # ppylint: disable=invalid-name
 
 def send_to_destination(destination, report_path, report): # pylint: disable=too-many-branches, too-many-statements, too-many-locals
     file_sent = False
