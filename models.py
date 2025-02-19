@@ -125,7 +125,7 @@ class ReportDestination(models.Model):
     destination = models.CharField(max_length=4096)
     description = models.CharField(max_length=4096, null=True, blank=True)
 
-    parameters = models.TextField(max_length=(32 * 1024 * 1024 * 1024))
+    parameters = models.TextField(max_length=(32 * 1024 * 1024 * 1024)) # pylint: disable=superfluous-parens
 
     def fetch_parameters(self):
         return json.loads(self.parameters)
@@ -159,7 +159,7 @@ class ReportJobBatchRequest(models.Model):
     started = models.DateTimeField(db_index=True, null=True, blank=True)
     completed = models.DateTimeField(db_index=True, null=True, blank=True)
 
-    parameters = models.TextField(max_length=(32 * 1024 * 1024 * 1024))
+    parameters = models.TextField(max_length=(32 * 1024 * 1024 * 1024)) # pylint: disable=superfluous-parens
 
     def process(self): # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         self.started = timezone.now()

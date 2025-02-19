@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import io
 import json
+import logging
 import os
 import shutil
 import time
@@ -17,6 +18,8 @@ import pytz
 from botocore.config import Config
 
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def send_to_destination(destination, report_path, report): # pylint: disable=too-many-branches, too-many-statements, too-many-locals
     file_sent = False
@@ -81,9 +84,8 @@ def send_to_destination(destination, report_path, report): # pylint: disable=too
                             file_sent = True
                     except: # pylint: disable=bare-except
                         if duration == sleep_durations[-1]:
-                            print('Unable to upload - error encountered. (Latest sleep = ' + str(duration) + ' seconds.)')
-
-                            traceback.print_exc()
+                            logger.error('Unable to upload - error encountered. (Latest sleep = %s seconds.)', duration)
+                            logger.error(traceback.format_exc())
 
         except BaseException:
             traceback.print_exc()
@@ -144,9 +146,8 @@ def send_to_destination(destination, report_path, report): # pylint: disable=too
                         break
                     except: # pylint: disable=bare-except
                         if duration == sleep_durations[-1]:
-                            print('Unable to upload - error encountered. (Latest sleep = ' + str(duration) + ' seconds.)')
-
-                            traceback.print_exc()
+                            logger.error('Unable to upload - error encountered. (Latest sleep = %s seconds.)', duration)
+                            logger.error(traceback.format_exc())
 
         except BaseException:
             traceback.print_exc()
@@ -232,4 +233,4 @@ def send_to_destination(destination, report_path, report): # pylint: disable=too
             traceback.print_exc()
 
     if file_sent is False:
-        print('Unable to transmit report to destination "' + destination.destination + '".')
+        logger.error('Unable to transmit report to destination "%s".', destination.destination)

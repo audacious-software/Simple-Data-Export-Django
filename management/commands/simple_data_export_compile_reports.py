@@ -8,6 +8,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import importlib
 import io
 import json
+import logging
 import os
 import tempfile
 import traceback
@@ -27,6 +28,8 @@ from django.utils import timezone
 from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
 from ...models import ReportJob, ReportJobBatchRequest, ReportDestination
+
+logger = logging.getLogger(__name__)
 
 REMOVE_SLEEP_MAX = 60 # Added to avoid "WindowsError: [Error 32] The process cannot access the file because it is being used by another process"
 
@@ -116,8 +119,9 @@ class Command(BaseCommand):
                                                         to_delete.append(output_file)
                                         except TypeError as exception:
                                             traceback.print_exc()
-                                            print('Verify that ' + app + ' "' + data_type + '" exporter implements all compile_data_export arguments!')
+                                            logger.error('Verify that %s "%s" exporter implements all compile_data_export arguments!', app, data_type)
                                             raise exception
+
                                     except ImportError:
                                         output_file = None
                                     except AttributeError:
