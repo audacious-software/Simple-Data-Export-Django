@@ -17,7 +17,7 @@ from django.utils import timezone
 SIMPLE_DATA_EXPORT_FILE_FOLDER = 'simple_data_export_uploads'
 
 class ReportJobManager(models.Manager): # pylint: disable=too-few-public-methods
-    def create_jobs(self, requester, data_sources, data_types, start_time=None, end_time=None, custom_parameters=None): # pylint: disable=too-many-arguments, no-self-use
+    def create_jobs(self, requester, data_sources, data_types, start_time=None, end_time=None, custom_parameters=None): # pylint: disable=too-many-arguments, no-self-use, too-many-positional-arguments
         batch_request = ReportJobBatchRequest(requester=requester, requested=timezone.now())
 
         job_parameters = {}
