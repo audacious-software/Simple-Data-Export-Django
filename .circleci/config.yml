@@ -81,6 +81,7 @@ jobs:
           name: Build and validate
           command: |
             sudo apt-get update && sudo apt-get install -y gdal-bin
+            which python
             python -m venv /home/circleci/venv
             ls -l venv /home/circleci/venv
             ls -l venv /home/circleci/venv/bin
