@@ -82,10 +82,10 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install -y gdal-bin
             which python
-            python -m venv /home/circleci/venv
-            ls -l venv /home/circleci/venv
-            ls -l venv /home/circleci/venv/bin
-            . /home/circleci/venv/bin/activate
+            # python -m venv /home/circleci/venv
+            # ls -l venv /home/circleci/venv
+            # ls -l venv /home/circleci/venv/bin
+            # . /home/circleci/venv/bin/activate
             pip install --upgrade pip
             echo "pip install --upgrade pip"
             pip install -r requirements.txt --progress-bar off
