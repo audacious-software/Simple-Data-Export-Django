@@ -7,6 +7,9 @@ from django.conf import settings
 CACHED_IDENTIFIERS = {}
 
 def fetch_export_identifier(original_identifier):
+    if isinstance(original_identifier, (tuple, list)):
+        original_identifier = original_identifier[0]
+
     if original_identifier in CACHED_IDENTIFIERS:
         return CACHED_IDENTIFIERS[original_identifier]
 

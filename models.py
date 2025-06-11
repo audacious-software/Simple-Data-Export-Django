@@ -177,8 +177,13 @@ class ReportJobBatchRequest(models.Model):
                     export_sources = export_api.export_data_sources(params)
 
                     for new_source in export_sources:
-                        if (new_source in sources) is False:
-                            sources.append(new_source)
+                        identifier = new_source
+
+                        if isinstance(new_source, str):
+                            identifier = (new_source, new_source, 'Uncategorized Exports')
+
+                        if (identifier in sources) is False:
+                            sources.append(identifier)
                 except ImportError:
                     pass
                 except AttributeError:
@@ -186,7 +191,7 @@ class ReportJobBatchRequest(models.Model):
         else:
             sources.extend(params['data_sources'])
 
-        sources.sort()
+        sources.sort(key=lambda source: '%s--%s' % (source[2], source[1]))
 
         pending_jobs = []
 

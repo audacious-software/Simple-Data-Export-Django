@@ -185,7 +185,6 @@ class Command(BaseCommand):
                     tokens = settings.SITE_URL.split('/')
                     host = ''
 
-
                     while tokens and tokens[-1] == '':
                         tokens.pop()
 
