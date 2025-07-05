@@ -9,10 +9,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import smart_str
-from django.utils.text import slugify
 
 from .models import ReportJob
-from .utils import fetch_export_identifier
 
 @staff_member_required
 def simple_data_export_download_report(request, report_id): # pylint: disable=unused-argument
@@ -60,9 +58,9 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
     for source in new_sources:
         if source[2] != last_category:
-           data_sources.append((source[2],))
+            data_sources.append((source[2],))
 
-           last_category = source[2]
+            last_category = source[2]
 
         data_sources.append(source)
 
