@@ -33,7 +33,7 @@ def simple_data_export_download_report(request, report_id): # pylint: disable=un
 def simple_data_export_form(request): # pylint: disable=too-many-branches
     context = {}
 
-    context['data_sources'] = []
+    new_sources = []
 
     for app in settings.INSTALLED_APPS:
         try:
@@ -42,15 +42,31 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
             data_sources = export_api.export_data_sources()
 
             for data_source in data_sources:
-                if (data_source in context['data_sources']) is False:
-                    new_source = (slugify(data_source[0]), fetch_export_identifier(data_source), data_source)
+                if isinstance(data_source, str):
+                    data_source = (data_source, data_source, 'Uncategorized Data Source')
 
-                    if (new_source in context['data_sources']) is False:
-                        context['data_sources'].append(new_source)
+                if (data_source in new_sources) is False:
+                    new_sources.append(data_source)
         except ImportError:
             pass
         except AttributeError:
             pass
+
+    new_sources.sort(key=lambda source: '%s--%s' % (source[2], source[1]))
+
+    data_sources = []
+
+    last_category = None
+
+    for source in new_sources:
+        if source[2] != last_category:
+           data_sources.append((source[2],))
+
+           last_category = source[2]
+
+        data_sources.append(source)
+
+    context['data_sources'] = data_sources
 
     context['data_types'] = []
 
@@ -74,7 +90,7 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
         for source in context['data_sources']:
             if ('source_' + source[0]) in request.POST: # pylint: disable=superfluous-parens
-                selected_sources.append(source[2][0])
+                selected_sources.append(source[0])
 
         for data_type in context['data_types']:
             if ('data_type_' + data_type[0]) in request.POST: # pylint: disable=superfluous-parens

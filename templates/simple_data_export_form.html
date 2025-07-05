@@ -16,8 +16,8 @@
 		<style>
 			.container {
 				max-width: 960px;
-			}		
-			
+			}
+
 			#select_all_sources, #deselect_all_sources, #select_all_types, #deselect_all_types {
 				color: blue;
 				cursor: pointer;
@@ -25,7 +25,7 @@
 		</style>
 	</head>
 	<body class="bg-light">
-		<div class="container">	
+		<div class="container">
 			<div class="row">
         		<div class="col-md-12 pb-3 mt-3">
         			<h1>Request Data Export</h1>
@@ -50,12 +50,21 @@
 						<h4>Select Data Sources</h4>
 						<div class="border rounded-2 p-3" style="height: 40em; overflow-y: scroll;">
 							{% for source in data_sources %}
-								<div class="form-check">
-									<input class="form-check-input source_checkbox" type="checkbox" name="source_{{ source.0 }}" id="source_{{ source.0 }}">
-									<label class="form-check-label" for="source_{{ source.0 }}">
-										{{ source.1 }}
-									</label>
-								</div>	        			
+								{% if source|length > 1 %}
+									<div class="form-check">
+										<input class="form-check-input source_checkbox source_group_{{ source.2|slugify }}" type="checkbox" name="source_{{ source.0 }}" id="source_{{ source.0 }}">
+										<label class="form-check-label" for="source_{{ source.0 }}">
+											{{ source.1 }}
+										</label>
+									</div>
+								{% else %}
+									<div class="form-check">
+										<input class="form-check-input source_group_checkbox" type="checkbox" name="source_group_{{ source.0|slugify }}" id="source_group_{{ source.0|slugify }}">
+										<label class="form-check-label" for="source_group_{{ source.0|slugify }}">
+											<strong>{{ source.0 }}</strong>
+										</label>
+									</div>
+								{% endif %}
 							{% endfor %}
 						</div>
 					</div>
@@ -71,7 +80,7 @@
 									<label class="form-check-label" for="data_type_{{ data_type.0  }}">
 										{{ data_type.1 }}
 									</label>
-								</div>	        			
+								</div>
 							{% endfor %}
 						</div>
 					</div>
@@ -100,7 +109,7 @@
 		$(document).ready(function() {
 			$("#deselect_all_sources").hide();
 			$("#deselect_all_types").hide();
-			
+
 			$("#select_all_sources").click(function() {
 				$(".source_checkbox").prop("checked", true);
 				$("#select_all_sources").hide();
@@ -125,9 +134,15 @@
 				$("#select_all_types").show();
 			});
 
+			$('.source_group_checkbox').click(function() {
+				const className = $(this).attr("id")
+
+				$(`.${className}`).prop("checked", $(this).prop("checked"))
+			})
+
 			$('.datetimepicker').datetimepicker({
 				format: 'yyyy-mm-dd hh:ii'
-			});			
+			});
 		});
 	</script>
 </html>
