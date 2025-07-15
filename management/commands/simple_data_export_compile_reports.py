@@ -40,8 +40,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @handle_lock
     @handle_schedule
+    @handle_lock
     def handle(self, *args, **options): # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         os.umask(000)
 
