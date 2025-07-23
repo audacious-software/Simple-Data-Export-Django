@@ -29,8 +29,6 @@ from quicksilver.decorators import handle_lock, handle_schedule, handle_logging,
 
 from ...models import ReportJob, ReportJobBatchRequest, ReportDestination
 
-logger = logging.getLogger(__name__) # pylint: disable=invalid-name
-
 REMOVE_SLEEP_MAX = 60 # Added to avoid "WindowsError: [Error 32] The process cannot access the file because it is being used by another process"
 
 class Command(BaseCommand):
@@ -55,7 +53,7 @@ class Command(BaseCommand):
         if logger is None:
             logger = logging.getLogger(__name__)
 
-        logger.debug('%s: Pending report jobs: %s' % (__name__, pending.count()))
+        logger.debug('%s: Pending report jobs: %s', __name__, pending.count())
 
         while pending.count() > 0:
             report = ReportJob.objects.filter(started=None, completed=None)\
@@ -232,9 +230,9 @@ class Command(BaseCommand):
                       .order_by('requested', 'pk')\
                       .first()
 
-        logger.debug('%s: Pending report job batch request: %s' % (__name__, request))
+        logger.debug('%s: Pending report job batch request: %s', __name__, request)
 
         if request is not None:
             request.process()
 
-        logger.debug('%s: Going to sleep...' % __name__)
+        logger.debug('%s: Going to sleep...', __name__)
