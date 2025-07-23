@@ -25,7 +25,7 @@ from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from django.utils import timezone
 
-from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
+from quicksilver.decorators import handle_lock, handle_schedule, handle_logging, add_qs_arguments
 
 from ...models import ReportJob, ReportJobBatchRequest, ReportDestination
 
@@ -40,6 +40,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
+    @handle_logging
     @handle_schedule
     @handle_lock
     def handle(self, *args, **options): # pylint: disable=too-many-locals,too-many-branches,too-many-statements
@@ -48,6 +49,13 @@ class Command(BaseCommand):
         here_tz = pytz.timezone(settings.TIME_ZONE)
 
         pending = ReportJob.objects.filter(started=None, completed=None)
+
+        logger = options.get('_logger', None)
+
+        if logger is None:
+            logger = logging.getLogger(__name__)
+
+        logger.debug('%s: Pending report jobs: %s' % (__name__, pending.count()))
 
         while pending.count() > 0:
             report = ReportJob.objects.filter(started=None, completed=None)\
@@ -224,5 +232,9 @@ class Command(BaseCommand):
                       .order_by('requested', 'pk')\
                       .first()
 
+        logger.debug('%s: Pending report job batch request: %s' % (__name__, request))
+
         if request is not None:
             request.process()
+
+        logger.debug('%s: Going to sleep...' % __name__)
