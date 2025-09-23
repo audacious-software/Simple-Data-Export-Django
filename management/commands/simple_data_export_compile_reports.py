@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=no-member,line-too-long
 
-from builtins import str # pylint: disable=redefined-builtin
-
 import importlib
 import io
 import json
@@ -88,7 +86,7 @@ class Command(BaseCommand):
                 if 'suffix' in parameters:
                     suffix = parameters['suffix']
 
-                filename = tempfile.gettempdir() + os.path.sep + prefix + '_' + str(report.pk) + '_' + suffix + '.zip'
+                filename = '%s%s%s_%s_%s.zip' % (tempfile.gettempdir(), os.path.sep, prefix, report.pk, suffix)
 
                 zips_to_merge = []
 
