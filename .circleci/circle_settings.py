@@ -41,7 +41,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'simple_data_export.circle_urls'
+ROOT_URLCONF = 'sm.circle_urls'
 
 TEMPLATES = [
     {
@@ -66,7 +66,7 @@ DATABASES = {
         'ENGINE':   'django.contrib.gis.db.backends.postgis',
         'NAME':     'circle_test',
         'USER':     'root',
-        'PASSWORD': '',
+        'PASSWORD': '', # nosec
         'HOST':     'localhost',
         'PORT':     '',
     }
