@@ -37,7 +37,7 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
         try:
             export_api = importlib.import_module(app + '.simple_data_export_api')
 
-            data_sources = export_api.export_data_sources()
+            data_sources = export_api.export_data_sources(requester=request.user)
 
             for data_source in data_sources:
                 if isinstance(data_source, str):
@@ -45,6 +45,16 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
 
                 if (data_source in new_sources) is False:
                     new_sources.append(data_source)
+        except ImportError:
+            pass
+        except AttributeError:
+            pass
+
+    for app in settings.INSTALLED_APPS:
+        try:
+            export_api = importlib.import_module(app + '.simple_data_export_api')
+
+            new_sources = export_api.prune_export_sources(new_sources)
         except ImportError:
             pass
         except AttributeError:
@@ -72,7 +82,7 @@ def simple_data_export_form(request): # pylint: disable=too-many-branches
         try:
             export_api = importlib.import_module(app + '.simple_data_export_api')
 
-            data_types = export_api.export_data_types()
+            data_types = export_api.export_data_types(new_sources)
 
             for data_type in data_types:
                 if (data_type in context['data_types']) is False:
