@@ -174,7 +174,7 @@ class ReportJobBatchRequest(models.Model):
                 try:
                     export_api = importlib.import_module(app + '.simple_data_export_api')
 
-                    export_sources = export_api.export_data_sources(params, requester=requester)
+                    export_sources = export_api.export_data_sources(params, requester=self.requester)
 
                     for new_source in export_sources:
                         identifier = new_source

@@ -28,7 +28,7 @@ def simple_data_export_download_report(request, report_id): # pylint: disable=un
     return response
 
 @staff_member_required
-def simple_data_export_form(request): # pylint: disable=too-many-branches
+def simple_data_export_form(request): # pylint: disable=too-many-branches, too-many-statements
     context = {}
 
     new_sources = []
